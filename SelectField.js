@@ -42,7 +42,7 @@ class SelectField extends React.Component {
 	}
 	
 	// Open & Close options //
-	handleOnBlur = () => setTimeout(() => { if(!this.state.lockOpen){this.setState({open: false, highlighted: this.props.value});} }, 100);
+	handleOnBlur = () => setTimeout(() => { if(!this.state.lockOpen){this.setState({open: false, highlighted: this.props.value});} }, 250);
 	handleOnClick = () => this.setState({ open: !this.state.open, lockOpen: false, highlighted: this.props.value });
 	handleOnClickContainer = () => this.setState({ lockOpen: true });
 	handleOnClickOption = (index) => { this.setState({ open: false, lockOpen: false, highlighted: this.props.value }); this.props.onChange(index); };
