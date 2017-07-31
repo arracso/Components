@@ -52,7 +52,7 @@ class SelectField extends React.Component {
 		var key = event.key.toUpperCase();
 		if(key==="ENTER"){
 			this.setState({ open: !this.state.open, lockOpen: false, highlighted: this.props.value });
-		}else if(key.isLetter()){
+		}else if(key.length == 1 && key.toUpperCase() != key.toLowerCase()){
 			var targetValue = this.props.children.find((option) => option.name.toUpperCase().startsWith(key)).value;
 			if(targetValue) this.setState({highlighted:targetValue});
 		}
