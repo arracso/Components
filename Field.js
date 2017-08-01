@@ -7,35 +7,8 @@ import Autosuggest from 'react-autosuggest';
 // Material-UI imports
 import { withStyles, createStyleSheet } from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
-import Menu, { MenuItem } from 'material-ui/Menu';
+import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
-
-class SelectField extends React.Component {
-	constructor(props){
-		super(props);
-		this.state = { open: false, anchorEl: undefined, };
-	}
-	
-	handleClick = event => { this.setState({ open: true, anchorEl: event.currentTarget }); };
-	handleRequestClose = () => { this.setState({ open: false }); };
-	handleMenuItemClick = (event, index) => { this.setState({ open: false }); this.props.onChange(index); };
-	
-	render(){
-		const { fullWidth, style, name, label, value, onChange, children } = this.props;
-		return (
-			<div>
-				<TextField fullWidth={fullWidth} onClick={this.handleClick} type="text" name={name} label={label} value={value} InputProps={{ placeholder: label }} />
-				<Menu style={{ maxHeight: '50%' }} MenuListProps={{ style: { width: '350px', maxWidth: 'calc(100vw - 100px)' }}} open={this.state.open} anchorEl={this.state.anchorEl} onRequestClose={this.handleRequestClose} >
-					{children.map((option) =>
-						<MenuItem key={option.value} selected={option.value === this.props.value} onClick={event => this.handleMenuItemClick(event, option.value)} >
-							{option.name}
-						</MenuItem>,
-					)}
-				</Menu>
-			</div>			
-		);
-	}
-}
 
 class SuggestField extends React.Component {
 	constructor(props){
