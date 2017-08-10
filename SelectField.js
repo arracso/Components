@@ -16,15 +16,17 @@ import TextField from 'material-ui/TextField';
 
 // SelectOption Component
 class SelectOption extends React.Component {
-	constructor(props){
-		super(props);
-	}
-	
-	componentDidMount(){ if(this.props.highlighted) ReactDOM.findDOMNode(this).scrollIntoView(false); }
-	
+	constructor(props){ super(props); }
+	componentDidMount(){ if(this.props.highlighted){
+		var target= ReactDOM.findDOMNode(this); 
+		target.parentNode.parentNode.scrollTop = target.offsetTop;
+	}}
 	componentWillReceiveProps(nextProps){
 		if(this.props.highlighted != nextProps.highlighted){
-			if(nextProps.highlighted) ReactDOM.findDOMNode(this).scrollIntoView(false);
+			if(nextProps.highlighted) {
+				var target= ReactDOM.findDOMNode(this); 
+				target.parentNode.parentNode.scrollTop = target.offsetTop;
+			}
 		}
 	}
 	
@@ -38,23 +40,44 @@ class SelectOption extends React.Component {
 class SelectField extends React.Component {
 	constructor(props){
 		super(props);
-		this.state = { open: false, lockOpen: false, highlighted: this.props.value };
+		this.state = { open: false, lockOpen: false, highlighted: this.props.value, searchKey: "" };
+	}
+	
+	shouldComponentUpdate(nextProps, nextState){
+		if(nextState != this.state || nextProps != this.props) return true;
+		return false;
 	}
 	
 	// Open & Close options //
-	handleOnBlur = () => setTimeout(() => { if(!this.state.lockOpen){this.setState({open: false, highlighted: this.props.value});} }, 250);
-	handleOnClick = () => this.setState({ open: !this.state.open, lockOpen: false, highlighted: this.props.value });
+	handleOnBlur = () => setTimeout(() => { if(!this.state.lockOpen){this.setState({open: false, highlighted: this.props.value, searchKey: ""});} }, 250);
+	handleOnClick = () => this.setState({ open: !this.state.open, lockOpen: false, highlighted: this.props.value, searchKey: "" });
 	handleOnClickContainer = () => this.setState({ lockOpen: true });
-	handleOnClickOption = (index) => { this.setState({ open: false, lockOpen: false, highlighted: this.props.value }); this.props.onChange(index); };
+	handleOnClickOption = (value) => { this.setState({ open: false, lockOpen: false, highlighted: this.props.value, searchKey: "" }); this.props.onChange(value); };
 	
-	// Search & Scroll to options //
+	
 	handleOnKeyDown = (event) => {
-		var key = event.key.toUpperCase();
-		if(key==="ENTER"){
-			this.setState({ open: !this.state.open, lockOpen: false, highlighted: this.props.value });
-		}else if(key.length == 1 && key.toUpperCase() != key.toLowerCase()){
-			var targetValue = this.props.children.find((option) => option.name.toUpperCase().startsWith(key)).value;
-			if(targetValue) this.setState({highlighted:targetValue});
+		var key = event.key.toUpperCase(); console.log(key);
+		if(key !== "TAB") event.preventDefault();
+		if(key === "ESCAPE"){
+			this.setState({ open: false, lockOpen: false, highlighted: this.props.value, searchKey: "" });
+		}else if(key === "ENTER"){
+			if(this.state.open){
+				this.setState({ open: false, lockOpen: false, searchKey: "" });
+				this.props.onChange(this.state.highlighted);
+			}else{
+				this.setState({ open: true, lockOpen: false, highlighted: this.props.value, searchKey: "" });
+			}
+		}else if(key === "ARROWUP" || key === "ARROWDOWN"){
+			var index = this.props.children.findIndex((option) => option.value == this.state.highlighted);
+			if(key === "ARROWDOWN"){ if(index<this.props.children.length-1) index++; } 
+			else if(index>0) index--;
+			this.setState({ highlighted: this.props.children[index].value });
+		}else if(key==" " || key.isLetter()){ // Search & Scroll to options //
+			if(this.state.searchKey == "")setTimeout(() => this.setState({searchKey: ""}), 1000);
+			var searchKey = this.state.searchKey + key;
+			var target = this.props.children.find((option) => option.name.toUpperCase().startsWith(searchKey));
+			if(target) this.setState({highlighted:target.value, searchKey:searchKey});
+			else this.setState({highlighted: "", searchKey: ""});
 		}
 	}
 	
